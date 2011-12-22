@@ -17,7 +17,7 @@ This tutorial begins with a belief that you have already sync'd down CyanogenMod
     <project
       path="device/samsung/epicmtd"
       name="EpicCM/android_device_samsung_epicmtd"
-      remote="EpicCM" revision="blob-overlay"
+      remote="EpicCM" revision="overlay-merge"
      />
     <project
       path="vendor/cyanogen"
