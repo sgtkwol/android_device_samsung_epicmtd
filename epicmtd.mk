@@ -17,7 +17,10 @@
 # These is the hardware-specific overlay, which points to the location
 # of hardware-specific resource overrides, typically the frameworks and
 # application settings that are stored in resourced.
+
+
 DEVICE_PACKAGE_OVERLAYS := device/samsung/epicmtd/overlay
+
 
 # These are the hardware-specific configuration files
 PRODUCT_COPY_FILES := \
@@ -87,6 +90,12 @@ PRODUCT_PACKAGES += \
 	bml_over_mtd \
 	setup_fs
 
+# Camera
+PRODUCT_PACKAGES += \
+    libs3cjpeg
+# tvout 
+PRODUCT_PACKAGES += \
+	tvouthack
 # apns config file
 PRODUCT_COPY_FILES += \
         device/samsung/epicmtd/prebuilt/etc/apns-conf.xml:system/etc/apns-conf.xml
@@ -113,7 +122,7 @@ PRODUCT_PROPERTY_OVERRIDES := \
 
 # Device-specific packages
 	PRODUCT_PACKAGES += \
-	AriesParts
+	EpicParts
 
 # Telephony property for CDMA
 PRODUCT_PROPERTY_OVERRIDES += \
