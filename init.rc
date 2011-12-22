@@ -20,6 +20,7 @@ loglevel 3
     export ANDROID_ASSETS /system/app
     export ANDROID_DATA /data
     export ANDROID_CACHE /cache
+    export DOWNLOAD_CACHE /cache/download
     export EXTERNAL_STORAGE /mnt/sdcard
     export EXTERNAL_STORAGE2 /mnt/sdcard
     export USBHOST_STORAGE /mnt/sdcard/usbStorage
@@ -222,11 +223,14 @@ on post-fs
     chown dhcp dhcp /data/misc/dhcp
     mkdir /data/local 0771 shell shell
     mkdir /data/local/tmp 0771 shell shell
+    mkdir /data/local/download 0771 system cache
     mkdir /data/data 0771 system system
     mkdir /data/app-private 0771 system system
     mkdir /data/app 0771 system system
     mkdir /data/property 0700 root root
-    
+
+    mkdir /cache/download 0771 system cache    
+
     #over-wirte-permission.
     chmod 0771 /data/app
     chown system system /data/app   
@@ -799,3 +803,11 @@ on property:ril.cdma.data_ready=true
 on property:ril.cdma.data_ready=false
     stop pppd_cdma
 
+service tvout /system/bin/tvoutserver
+    user system
+    group graphics
+
+service tvouthack /system/bin/tvouthack
+    user system
+    group graphics
+    disabled
