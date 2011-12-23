@@ -82,7 +82,7 @@ PRODUCT_PACKAGES += \
 
 # Libs
 PRODUCT_PACKAGES += \
-    sensors.s5pc110
+    sensors.s5pc110 \
     libstagefrighthw \
     overlay.s5pc110
 
