@@ -106,10 +106,6 @@ loglevel 3
     insmod /lib/modules/vibrator.ko
 
 
-
-# SprintHotspot
-    insmod /lib/modules/hotspot_event_monitoring.ko
-
     #temp
     chown root root /sbin/fat.format
     chmod 750 /sbin/fat.format
