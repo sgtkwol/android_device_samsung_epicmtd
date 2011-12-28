@@ -12,19 +12,7 @@ This tutorial begins with a belief that you have already sync'd down CyanogenMod
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
   <manifest>
-    <remote name="EpicCM" fetch="https://github.com" />
-
-    <project
-      path="device/samsung/epicmtd"
-      name="EpicCM/android_device_samsung_epicmtd"
-      remote="EpicCM" revision="gingerbread"
-     />
-    <project
-      path="vendor/cyanogen"
-      name="EpicCM/android_vendor_cyanogen"
-      remote="EpicCM"
-      revision="epiccm-rebase"
-    />
+    <project path="kernel/samsung/victory" name="CyanogenMod/android_kernel_samsung_victory" remote="github" revision="gingerbread"/>
   </manifest>
 ```
 
