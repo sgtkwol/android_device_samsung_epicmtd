@@ -100,8 +100,6 @@ loglevel 3
     write /dev/cpuctl/bg_non_interactive/cpu.shares 52
 
 
-    insmod /lib/modules/dpram.ko
-
      # ko files for vibrator
     insmod /lib/modules/vibrator.ko
 
@@ -137,14 +135,7 @@ on fs
     chmod 0777 /data/db-journal
     mount yaffs2 mtd@cache /cache nosuid nodev
 
-    insmod /lib/modules/param.ko
-    
 
-#  Wimax modules
- 	
-#    insmod /lib/modules/wimax_gpio.ko
-#    insmod /lib/modules/cmc7xx_sdio.ko
-	
 
 on post-fs
     # once everything is setup, no need to modify /

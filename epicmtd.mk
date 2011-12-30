@@ -32,7 +32,8 @@ PRODUCT_COPY_FILES := \
 PRODUCT_COPY_FILES += \
   device/samsung/epicmtd/init.rc:root/init.rc \
   device/samsung/epicmtd/ueventd.rc:root/ueventd.rc \
-  device/samsung/epicmtd/lpm.rc:root/lpm.rc
+  device/samsung/epicmtd/lpm.rc:root/lpm.rc \
+  device/samsung/epicmtd/init.Victory.rc:root/init.Victory.rc
 
 # kernel modules for ramdisk
 PRODUCT_COPY_FILES += \

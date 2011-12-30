@@ -23,7 +23,6 @@ on init
 
 on early-fs
 
-    insmod /lib/modules/param.ko
 
 on fs
     mount tmpfs tmpfs /tmp
