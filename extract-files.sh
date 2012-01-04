@@ -57,7 +57,9 @@ FILES="
 bin/BCM4329B1_002.002.023.0746.0832.hcd
 
 etc/wifi/nvram_net.txt
-
+etc/wimax_boot.bin
+etc/wimaxfw.bin
+etc/wimaxloader.bin
 
 bin/tvoutserver
 cameradata/datapattern_420sp.yuv
@@ -188,7 +190,10 @@ PRODUCT_COPY_FILES += \\
 # Wifi
 #
 PRODUCT_COPY_FILES += \\
-    vendor/samsung/__DEVICE__/proprietary/etc/wifi/nvram_net.txt:system/etc/wifi/nvram_net.txt
+    vendor/samsung/__DEVICE__/proprietary/etc/wifi/nvram_net.txt:system/etc/wifi/nvram_net.txt \\
+    vendor/samsung/__DEVICE__/proprietary/etc/wimax_boot.bin:system/etc/wimax_boot.bin \\
+    vendor/samsung/__DEVICE__/proprietary/etc/wimaxfw.bin:system/etc/wimaxfw.bin \\
+    vendor/samsung/__DEVICE__/proprietary/etc/wimaxloader.bin:system/etc/wimaxloader.bin
 
 
 #
