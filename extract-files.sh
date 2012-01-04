@@ -14,6 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# WiMAX Support Note: All WiMAX framework and library proprietary blobs
+# needed for this build are available at
+# http://code.google.com/android/nexus/drivers.html#crespo4g
+
 DEVICE=epicmtd
 
 rm -rf ../../../vendor/samsung/$DEVICE/*
