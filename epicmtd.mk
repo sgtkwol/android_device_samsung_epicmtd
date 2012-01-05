@@ -34,12 +34,9 @@ PRODUCT_COPY_FILES += \
   device/samsung/epicmtd/lpm.rc:root/lpm.rc \
   device/samsung/epicmtd/init.victory.rc:root/init.victory.rc
 
-# kernel modules for ramdisk
+# kernel modules
 PRODUCT_COPY_FILES += \
-    $(call find-copy-subdir-files,*,device/samsung/epicmtd/modules,root/lib/modules)
-
-PRODUCT_COPY_FILES += \
-    $(call find-copy-subdir-files,*,device/samsung/epicmtd/modules,recovery/root/lib/modules)
+    $(call find-copy-subdir-files,*,device/samsung/epicmtd/modules,system/lib/modules)
 
 # WiFi
 PRODUCT_COPY_FILES += \
