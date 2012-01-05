@@ -84,6 +84,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     sensors.s5pc110 \
     libstagefrighthw \
+    libcamera \
     overlay.s5pc110
 
 # update utilities
