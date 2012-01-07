@@ -1,7 +1,3 @@
-on init
-# Update BOOTCLASSPATH for wimax
-export BOOTCLASSPATH /system/framework/core.jar:/system/framework/bouncycastle.jar:/system/framework/ext.jar:/system:/system/vendor/lib/wimax_service.jar
-
 on post-fs
 
 #load vibrator modules
