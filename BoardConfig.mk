@@ -8,6 +8,8 @@ BOARD_USES_LIBSECRIL_STUB := true
 # Use the non-open-source parts, if they exist
 -include vendor/samsung/epicmtd/BoardConfigVendor.mk
 
+BOARD_USE_LEGACY_TOUCHSCREEN := true
+
 # Processor optimizations
 TARGET_CPU_ABI := armeabi-v7a
 TARGET_CPU_ABI2 := armeabi
