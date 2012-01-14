@@ -18,8 +18,8 @@
 <!-- Note that IconMode can be only 0, ON or 1, FLASHING
      The icon is turned OFF if then IconIndex = 1 -->
 
-<EriFile VersionNumber="1357"
-         NumberOfEriEntries="176"
+<EriFile VersionNumber="1358"
+         NumberOfEriEntries="179"
          EriFileType="1">
 
          <CallPromptId Id="0"
