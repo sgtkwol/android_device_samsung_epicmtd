@@ -136,7 +136,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     net.interfaces.defaultroute=cdma \
     net.cdma.ppp.interface=ppp0 \
     net.connectivity.type=CDMA1 \
-    mobiledata.interfaces=eth0,ppp0,uwbr0 \
+    mobiledata.interfaces=ppp0,uwbr0 \
     ro.telephony.ril_class=samsung \
     ro.ril.samsung_cdma=true
 
