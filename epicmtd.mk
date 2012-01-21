@@ -44,26 +44,15 @@ PRODUCT_COPY_FILES += \
 
 # Keylayout and Keychars
 PRODUCT_COPY_FILES += \
+     device/samsung/epicmtd/prebuilt/usr/keylayout/cypress-touchkey.kl:system/usr/keylayout/cypress-touchkey.kl \
+     device/samsung/epicmtd/prebuilt/usr/keychars/cypress-touchkey.kcm:system/usr/keychars/cypress-touchkey.kcm \
      device/samsung/epicmtd/prebuilt/usr/keylayout/s3c-keypad.kl:system/usr/keylayout/s3c-keypad.kl \
+     device/samsung/epicmtd/prebuilt/usr/keychars/s3c-keypad.kcm:system/usr/keychars/s3c-keypad.kcm \
      device/samsung/epicmtd/prebuilt/usr/keylayout/sec_jack.kl:system/usr/keylayout/sec_jack.kl \
-     device/samsung/epicmtd/prebuilt/usr/keylayout/AVRCP.kl:system/usr/keylayout/AVRCP.kl \
-     device/samsung/epicmtd/prebuilt/usr/keylayout/aries-keypad.kl:system/usr/keylayout/aries-keypad.kl \
-     device/samsung/epicmtd/prebuilt/usr/keylayout/melfas_touchkey.kl:system/usr/keylayout/melfas_touchkey.kl \
-     device/samsung/epicmtd/prebuilt/usr/keylayout/qwerty.kl:system/usr/keylayout/qwerty.kl \
-     device/samsung/epicmtd/prebuilt/usr/keylayout/Broadcom_Bluetooth_HID.kl:system/usr/keylayout/Broadcom_Bluetooth_HID.kl \
-     device/samsung/epicmtd/prebuilt/usr/keychars/Broadcom_Bluetooth_HID.kcm.bin:system/usr/keychars/Broadcom_Bluetooth_HID.kcm.bin \
-     device/samsung/epicmtd/prebuilt/usr/keychars/s3c-keypad.kcm.bin:system/usr/keychars/s3c-keypad.kcm.bin \
-     device/samsung/epicmtd/prebuilt/usr/keychars/melfas_touchkey.kcm.bin:system/usr/keychars/melfas_touchkey.kcm.bin \
-     device/samsung/epicmtd/prebuilt/usr/keychars/qwerty.kcm.bin:system/usr/keychars/qwerty.kcm.bin \
-     device/samsung/epicmtd/prebuilt/usr/keychars/aries-keypad.kcm.bin:system/usr/keychars/aries-keypad.kcm.bin \
-     device/samsung/epicmtd/prebuilt/usr/keychars/qwerty2.kcm.bin:system/usr/keychars/qwerty2.kcm.bin \
+     device/samsung/epicmtd/prebuilt/usr/keychars/sec_jack.kcm:system/usr/keychars/sec_jack.kcm \
+     device/samsung/epicmtd/prebuilt/usr/keylayout/victory-keypad.kl:system/usr/keylayout/victory-keypad.kl \
+     device/samsung/epicmtd/prebuilt/usr/keychars/victory-keypad.kcm:system/usr/keychars/victory-keypad.kcm \
      device/samsung/epicmtd/prebuilt/usr/idc/qt602240_ts_input.idc:system/usr/idc/qt602240_ts_input.idc
-
-
-# Generated kcm keymaps
-PRODUCT_PACKAGES := \
-    cypress-touchkey.kcm \
-    s3c-keypad.kcm
 
 # These are the OpenMAX IL configuration files
 PRODUCT_COPY_FILES += \

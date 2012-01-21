@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-key 163   MEDIA_NEXT        WAKE
-key 165   MEDIA_PREVIOUS    WAKE
-key 226   HEADSETHOOK       WAKE
+key 139    MENU           VIRTUAL
+key 102    HOME           VIRTUAL
+key 158    BACK           VIRTUAL
+key 217    SEARCH         VIRTUAL
