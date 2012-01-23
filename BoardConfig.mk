@@ -36,8 +36,9 @@ TARGET_RELEASETOOL_OTA_FROM_TARGET_SCRIPT := ./device/samsung/epicmtd/releasetoo
 TARGET_RELEASETOOL_IMG_FROM_TARGET_SCRIPT := ./device/samsung/epicmtd/releasetools/epicmtd_img_from_target_files
 
 # Camera defines
-USE_CAMERA_STUB := true
+USE_CAMERA_STUB := false
 ifeq ($(USE_CAMERA_STUB),false)
+BOARD_SECOND_CAMERA_DEVICE := true
 BOARD_CAMERA_LIBRARIES := libcamera
 endif
 
@@ -54,8 +55,8 @@ BOARD_HAVE_BLUETOOTH_BCM := true
 # Video Devices
 BOARD_USES_OVERLAY := true
 BOARD_V4L2_DEVICE := /dev/video1
-#BOARD_CAMERA_DEVICE := /dev/video0
-#BOARD_SECOND_CAMERA_DEVICE := /dev/video2
+BOARD_CAMERA_DEVICE := /dev/video0
+BOARD_SECOND_CAMERA_DEVICE := /dev/video2
 
 # Max image/partition sizes
 BOARD_BOOTIMAGE_MAX_SIZE := $(call image-size-from-data-size,0x00280000)

@@ -83,7 +83,8 @@ PRODUCT_PACKAGES += \
 
 # Camera
 PRODUCT_PACKAGES += \
-    libs3cjpeg
+    libs3cjpeg \
+    camera.s5pc110 
 # tvout 
 PRODUCT_PACKAGES += \
 	tvouthack
