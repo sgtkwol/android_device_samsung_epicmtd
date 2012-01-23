@@ -103,7 +103,7 @@ than the size of the config_autoBrightnessLevels array.
         TYPE_MOBILE:0 TYPE_WIFI:1 TYPE_MOBILE_MMS:2
 	TYPE_MOBILE_SUPL:3 TYPE_MOBILE_DUN:4 TYPE_MOBILE_HIPRI:5
 	TYPE_WIMAX:6 TYPE_BLUETOOTH:7 TYPE_DUMMY:8 TYPE_ETHERNET: 9 -->
-    
+
     <string-array translatable="false" name="networkAttributes">
         <item>"mobile,0,0,0,-1,true"</item>
 	<item>"wifi,1,1,1,-1,true"</item>
@@ -213,4 +213,11 @@ than the size of the config_autoBrightnessLevels array.
 
     <!-- Indicate whether the SD card is accessible without removing the battery. -->
     <bool name="config_batterySdCardAccessibility">true</bool>
+
+    <!-- CM CHANGES START HERE -->
+
+    <!-- LUN file to be used by legacy USB manager.
+         The existence of this file will be used to determine in the
+	 legacy USB manager should be started. -->
+    <string name="config_legacyUmsLunFile">/sys/devices/platform/usb_mass_storage/lun0/file</string>
 </resources>
