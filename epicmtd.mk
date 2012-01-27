@@ -112,10 +112,10 @@ PRODUCT_COPY_FILES += \
     device/samsung/epicmtd/prebuilt/etc/media_profiles.xml:system/etc/media_profiles.xml
 
 # Enable "Android debugging" in Settings menu.
-# Enable USB mass storage and adb at boot.
+# Enable USB mass storage (and adb) at boot.
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES := \
     persist.service.adb.enable=1 \
-    persist.sys.usb.config=mass_storage,adb
+    persist.sys.usb.config=mass_storage
 
 # The OpenGL ES API level that is natively supported by this device.
 # This is a 16.16 fixed point number
