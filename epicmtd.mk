@@ -39,6 +39,10 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(call find-copy-subdir-files,*,device/samsung/epicmtd/modules,system/lib/modules)
 
+# RIL
+PRODUCT_COPY_FILES += \
+     device/samsung/epicmtd/prebuilt/bin/pppd_runner:system/bin/pppd_runner
+
 # WiFi
 PRODUCT_COPY_FILES += \
      device/samsung/epicmtd/prebuilt/etc/wifi/wpa_supplicant.conf:system/etc/wifi/wpa_supplicant.conf
