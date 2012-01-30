@@ -52,7 +52,7 @@ key 43    TAB               WAKE_DROPPED
 key 44    COMMA             WAKE_DROPPED
 key 45    SPACE             WAKE_DROPPED
 
-key 46    CAMERA            WAKE_DROPPED
+key 46    CAMERA
 key 47    PERIOD            WAKE_DROPPED
 key 48    DPAD_LEFT         WAKE_DROPPED
 key 49    DPAD_DOWN         WAKE_DROPPED
@@ -64,7 +64,7 @@ key 53    HOME              WAKE_DROPPED
 key 54    SEARCH            WAKE_DROPPED
 key 55    MENU              WAKE_DROPPED
 
-key 56    FOCUS             WAKE_DROPPED
+key 56    FOCUS
 key 57    BACK              WAKE_DROPPED
 #key 58    POWER             WAKE
 #key 59    SLIDE             WAKE
