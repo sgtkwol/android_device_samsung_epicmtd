@@ -101,6 +101,9 @@ def WriteFullOTAPackage(input_zip, output_zip):
   script.ShowProgress(0.15, 5)
   Item.Get("system").SetPermissions(script)
 
+  if OPTIONS.backuptool:
+    script.RunBackup("restore")
+
   CopyBootFiles(input_zip, output_zip)
   CopyBMLoverMTD(output_zip)
 
