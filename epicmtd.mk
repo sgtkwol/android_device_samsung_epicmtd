@@ -144,6 +144,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     net.connectivity.type=CDMA1 \
     mobiledata.interfaces=ppp0,uwbr0 \
     ro.telephony.ril_class=SamsungRIL \
+    ro.telephony.ril.v3=datacall \
     ro.ril.samsung_cdma=true
 
 # WiMAX Property setting for checking WiMAX interface
