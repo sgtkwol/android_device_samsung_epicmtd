@@ -184,11 +184,7 @@
     <integer-array translatable="false" name="config_tether_upstream_types">
         <item>0</item> <!-- TYPE_MOBILE -->
         <item>1</item> <!-- TYPE_WIFI -->
-	<item>2</item> <!-- TYPE_MOBILE_MMS -->
-	<item>3</item> <!-- TYPE_MOBILE_SUPL -->
-	<item>4</item> <!-- TYPE_MOBILE_DUN -->
-        <item>5</item> <!-- TYPE_MOBILE_HIPRI -->
-	<item>6</item> <!-- TYPE_WIMAX -->
+        <item>6</item> <!-- TYPE_WIMAX -->
         <item>7</item> <!-- TYPE_BLUETOOTH -->
     </integer-array>
 
