@@ -26,6 +26,8 @@
 #include <hardware_legacy/AudioHardwareBase.h>
 #include <media/mediarecorder.h>
 
+#include "secril-client.h"
+
 extern "C" {
     struct pcm;
     struct mixer;
@@ -117,6 +119,8 @@ public:
 
             status_t setInputSource_l(audio_source source);
 
+            void setVoiceVolume_l(float volume);
+
     static uint32_t    getInputSampleRate(uint32_t sampleRate);
            sp <AudioStreamInALSA> getActiveInput_l();
 
@@ -152,10 +156,25 @@ private:
     uint32_t        mPcmOpenCnt;
     uint32_t        mMixerOpenCnt;
     bool            mInCallAudioMode;
+    float           mVoiceVol;
 
     audio_source    mInputSource;
     bool            mBluetoothNrec;
     int             mTTYMode;
+
+    void*           mSecRilLibHandle;
+    HRilClient      mRilClient;
+    bool            mActivatedCP;
+    HRilClient      (*openClientRILD)  (void);
+    int             (*disconnectRILD)  (HRilClient);
+    int             (*closeClientRILD) (HRilClient);
+    int             (*isConnectedRILD) (HRilClient);
+    int             (*connectRILD)     (HRilClient);
+    int             (*setCallVolume)   (HRilClient, SoundType, int);
+    int             (*setCallAudioPath)(HRilClient, AudioPath);
+    int             (*setCallClockSync)(HRilClient, SoundClockCondition);
+    void            loadRILD(void);
+    status_t        connectRILDIfRequired(void);
 
     //  trace driver operations for dump
     int             mDriverOp;
