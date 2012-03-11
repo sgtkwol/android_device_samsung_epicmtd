@@ -14,7 +14,6 @@
     <string name="uaProfUrlApollo">http://wap.samsungmobile.com/uaprof/GT-i5801.xml</string>
     <string name="userAgentApollo">SAMSUNG-GT-I5801-Mms/2.0</string>
     <int name="recipientLimit">-1</int>
-    <int name="smsToMmsTextThreshold">7</int>
     <string name="emailGatewayNumber">6245</string>
     <bool name="disableEndterKey">false</bool>
     <bool name="composeMaxLengthLimit">false</bool>
@@ -22,4 +21,7 @@
     <bool name="inputModeAuto">false</bool>
     <bool name="dateTimeFormat">false</bool>
     <bool name="japanFeature">false</bool>
+    <bool name="enableMultipartSMS">false</bool>
+    <int name="smsToMmsTextThreshold">4</int>
+    <bool name="enableSplitSMS">true</bool>
 </mms_config>
