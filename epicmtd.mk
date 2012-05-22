@@ -124,10 +124,6 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES := \
 PRODUCT_PROPERTY_OVERRIDES := \
     ro.opengles.version=131072
 
-# Device-specific packages
-	PRODUCT_PACKAGES += \
-	EpicParts
-
 # Telephony property for CDMA
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.config.vc_call_vol_steps=15 \
