@@ -31,7 +31,7 @@ on post-fs
   exec /system/xbin/busybox mknod -m 0660 /dev/swmxctl c 234 0
   exec /system/xbin/busybox mknod -m 0660 /dev/uwibro c 233 0
   chown system system /dev/swmxctl
-  chown system system /dev/uwibro
+  exec /system/xbin/busybox chown system.system /dev/uwibro
 
   # For sensor control
   chown system input /sys/class/input/input0/enable
