@@ -95,6 +95,12 @@ PRODUCT_PACKAGES += \
 # tvout 
 PRODUCT_PACKAGES += \
 	tvouthack
+
+# Device-specific packages
+PRODUCT_PACKAGES += \
+    EpicParts
+
+
 # apns config file
 PRODUCT_COPY_FILES += \
         device/samsung/epicmtd/prebuilt/etc/apns-conf.xml:system/etc/apns-conf.xml
@@ -118,10 +124,6 @@ PRODUCT_COPY_FILES += \
 # This is a 16.16 fixed point number
 PRODUCT_PROPERTY_OVERRIDES := \
     ro.opengles.version=131072
-
-# Device-specific packages
-	PRODUCT_PACKAGES += \
-	EpicParts
 
 # Telephony property for CDMA
 PRODUCT_PROPERTY_OVERRIDES += \
