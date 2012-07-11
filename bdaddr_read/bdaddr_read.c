@@ -26,7 +26,7 @@ int main() {
 
     if ( stat("/data/bdaddr", &st) == 0 ) {
         printf("bdaddr has previously been written, exiting\n");
-        LOGE("bdaddr has previously been written, exiting\n");
+        ALOGE("bdaddr has previously been written, exiting\n");
         return -1;
     }
 
@@ -38,28 +38,28 @@ int main() {
 
     if (buf[0] == 0) {
         printf("Unable to read default bdaddr from ril.bt_macaddr, reverting\n");
-        LOGE("Unable to read default bdaddr from ril.bt_macaddr, reverting\n");
+        ALOGE("Unable to read default bdaddr from ril.bt_macaddr, reverting\n");
         return -1;
     }
 
     printf("Read default bdaddr from ril.bt_macaddr: %s\n", buf);
-    LOGE("Read default bdaddr from ril.bt_macaddr: %s\n", buf);
+    ALOGE("Read default bdaddr from ril.bt_macaddr: %s\n", buf);
 
     sprintf(addr_from_ril, "%2.2s:%2.2s:%2.2s:%2.2s:%2.2s:%2.2s\0",
             buf, buf+2, buf+4, buf+6, buf+8, buf+10);
 
     printf("Converted to formatted mac: %s\n", addr_from_ril);
-    LOGE("Converted to formatted mac: %s\n", addr_from_ril);
+    ALOGE("Converted to formatted mac: %s\n", addr_from_ril);
 
     fd = open(BDADDR_PATH, O_WRONLY|O_CREAT|O_TRUNC, 00600|00060|00006);
     if (fd < 0) {
         printf("Unable to open bdaddr, bailing\n");
-        LOGE("Unable to open bdaddr, bailing\n");
+        ALOGE("Unable to open bdaddr, bailing\n");
         return -2;
     }
 
     write(fd, addr_from_ril, 18);
     close(fd);
-    LOGE("System will now read mac on reboot.\n");
+    ALOGE("System will now read mac on reboot.\n");
     return (0);
 }
