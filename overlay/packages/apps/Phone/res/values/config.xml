@@ -21,6 +21,6 @@
     <bool name="has_in_call_noise_suppression">true</bool>
 
     <!-- Sprint Message Wait Indicator Quirk -->
-    <bool name="sprint_mwi_quirk">true</bool>
+    <!-- <bool name="sprint_mwi_quirk">true</bool> -->
 
 </resources>
