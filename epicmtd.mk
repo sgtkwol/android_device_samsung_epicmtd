@@ -76,9 +76,13 @@ PRODUCT_PACKAGES += \
     audio.primary.s5pc110 \
     audio_policy.s5pc110 \
     audio.a2dp.default \
+    audio.usb.default \
     sensors.s5pc110 \
     libstagefrighthw
 #   hwcomposer.s5pc110
+
+PRODUCT_COPY_FILES += \
+        device/samsung/epicmtd/libaudio/audio_policy.conf:system/etc/audio_policy.conf
 
 # ics libs (jb version not yet working)
 PRODUCT_COPY_FILES += \
