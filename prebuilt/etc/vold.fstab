@@ -13,4 +13,4 @@
 ## flags        - (optional) Comma separated list of flags, must not contain '/' character
 ######################
 
-dev_mount sdcard /mnt/sdcard auto /devices/platform/s3c-sdhci.2/mmc_host/mmc2
+dev_mount sdcard /storage/sdcard0 auto /devices/platform/s3c-sdhci.2/mmc_host/mmc2

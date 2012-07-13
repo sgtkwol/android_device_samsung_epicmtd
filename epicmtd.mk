@@ -26,6 +26,7 @@ DEVICE_PACKAGE_OVERLAYS := device/samsung/epicmtd/overlay
 PRODUCT_COPY_FILES := \
     device/samsung/epicmtd/prebuilt/etc/asound.conf:system/etc/asound.conf \
     device/samsung/epicmtd/prebuilt/etc/vold.fstab:system/etc/vold.fstab \
+    device/samsung/epicmtd/prebuilt/etc/media_codecs.xml:system/etc/media_codecs.xml \
     device/samsung/epicmtd/prebuilt/etc/egl.cfg:system/lib/egl/egl.cfg
 
 # Init files
