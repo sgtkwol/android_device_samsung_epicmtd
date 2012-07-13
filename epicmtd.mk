@@ -76,9 +76,13 @@ PRODUCT_PACKAGES += \
     audio.primary.s5pc110 \
     audio_policy.s5pc110 \
     audio.a2dp.default \
-    hwcomposer.s5pc110 \
     sensors.s5pc110 \
     libstagefrighthw
+#   hwcomposer.s5pc110
+
+# ics libs (jb version not yet working)
+PRODUCT_COPY_FILES += \
+    device/samsung/epicmtd/prebuilt/lib/hw/hwcomposer.s5pc110.so:system/lib/hw/hwcomposer.s5pc110.so
 
 # update utilities
 PRODUCT_PACKAGES += \
@@ -90,10 +94,10 @@ PRODUCT_PACKAGES += \
 	bdaddr_read
 
 # Camera
-PRODUCT_PACKAGES += \
-    libs3cjpeg \
-    camera.s5pc110 \
-    sensors.s5pc110
+#PRODUCT_PACKAGES += \
+#    libs3cjpeg \
+#    camera.s5pc110 \
+#    sensors.s5pc110
 
 # tvout 
 PRODUCT_PACKAGES += \
