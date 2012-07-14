@@ -1197,50 +1197,50 @@ int SecCamera::setSnapshotCmd(void)
 
 
     // GPS
-    ret = fimc_v4l2_s_ext_ctrl(m_cam_fd, V4L2_CID_CAMERA_GPS_LATITUDE, &gpsInfoLatitude);
-    CHECK(ret);
-    ret = fimc_v4l2_s_ext_ctrl(m_cam_fd, V4L2_CID_CAMERA_GPS_LONGITUDE, &gpsInfoLongitude);
-    CHECK(ret);
-    ret = fimc_v4l2_s_ext_ctrl(m_cam_fd, V4L2_CID_CAMERA_GPS_ALTITUDE, &gpsInfoAltitude);
-    CHECK(ret);
-    ret = fimc_v4l2_s_ext_ctrl(m_cam_fd, V4L2_CID_CAMERA_GPS_PROCESSINGMETHOD, mExifInfo.gps_processing_method);
-    CHECK(ret);
-    unsigned long temp = m_gps_timestamp;
-    ret = fimc_v4l2_s_ext_ctrl(m_cam_fd, V4L2_CID_CAMERA_GPS_TIMESTAMP, &temp);
-    CHECK(ret);
+    //ret = fimc_v4l2_s_ext_ctrl(m_cam_fd, V4L2_CID_CAMERA_GPS_LATITUDE, &gpsInfoLatitude);
+    //CHECK(ret);
+    //ret = fimc_v4l2_s_ext_ctrl(m_cam_fd, V4L2_CID_CAMERA_GPS_LONGITUDE, &gpsInfoLongitude);
+    //CHECK(ret);
+    //ret = fimc_v4l2_s_ext_ctrl(m_cam_fd, V4L2_CID_CAMERA_GPS_ALTITUDE, &gpsInfoAltitude);
+    //CHECK(ret);
+    //ret = fimc_v4l2_s_ext_ctrl(m_cam_fd, V4L2_CID_CAMERA_GPS_PROCESSINGMETHOD, mExifInfo.gps_processing_method);
+    //CHECK(ret);
+    //unsigned long temp = m_gps_timestamp;
+    //ret = fimc_v4l2_s_ext_ctrl(m_cam_fd, V4L2_CID_CAMERA_GPS_TIMESTAMP, &temp);
+    //CHECK(ret);
     
     // Time
-    time_t rawtime;
-    time(&rawtime);
-    struct tm *timeinfo = localtime(&rawtime);
-    ret = fimc_v4l2_s_ext_ctrl(m_cam_fd, V4L2_CID_CAMERA_EXIF_TIME_INFO, timeinfo);
-    CHECK(ret);
+    //time_t rawtime;
+    //time(&rawtime);
+    //struct tm *timeinfo = localtime(&rawtime);
+    //ret = fimc_v4l2_s_ext_ctrl(m_cam_fd, V4L2_CID_CAMERA_EXIF_TIME_INFO, timeinfo);
+    //CHECK(ret);
 
     // Orientation
-    int orientation;
-    switch (m_exif_orientation) {
-    case 0:
-        orientation = EXIF_ORIENTATION_UP;
-        break;
-    case 90:
-        orientation = EXIF_ORIENTATION_90;
-        break;
-    case 180:
-        orientation = EXIF_ORIENTATION_180;
-        break;
-    case 270:
-        orientation = EXIF_ORIENTATION_270;
-        break;
-    default:
-        orientation = EXIF_ORIENTATION_UP;
-        break;
-    }
-    ret = fimc_v4l2_s_ctrl(m_cam_fd, V4L2_CID_CAMERA_EXIF_ORIENTATION, orientation);
-    CHECK(ret);
-    ret = fimc_v4l2_s_ctrl(m_cam_fd, V4L2_CID_CAMERA_CAPTURE, 0);
-    CHECK(ret);
+    //int orientation;
+    //switch (m_exif_orientation) {
+    //case 0:
+    //    orientation = EXIF_ORIENTATION_UP;
+    //    break;
+    //case 90:
+    //    orientation = EXIF_ORIENTATION_90;
+    //    break;
+    //case 180:
+    //    orientation = EXIF_ORIENTATION_180;
+    //    break;
+    //case 270:
+    //    orientation = EXIF_ORIENTATION_270;
+    //    break;
+    //default:
+    //    orientation = EXIF_ORIENTATION_UP;
+    //    break;
+   // }
+   // ret = fimc_v4l2_s_ctrl(m_cam_fd, V4L2_CID_CAMERA_EXIF_ORIENTATION, orientation);
+   // CHECK(ret);
+   // ret = fimc_v4l2_s_ctrl(m_cam_fd, V4L2_CID_CAMERA_CAPTURE, 0);
+   // CHECK(ret);
 
-    LOG_TIME_END(1)
+    //LOG_TIME_END(1)
 
     return 0;
 }
