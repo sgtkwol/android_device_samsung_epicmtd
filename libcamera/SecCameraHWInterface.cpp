@@ -392,7 +392,7 @@ status_t CameraHardwareSec::setPreviewWindow(preview_stream_ops *w)
     mPreviewLock.lock();
 
     if (mPreviewRunning && !mPreviewStartDeferred) {
-        ("stop preview (window change)");
+        ALOGI("stop preview (window change)");
         stopPreviewInternal();
     }
 
@@ -493,21 +493,21 @@ void CameraHardwareSec::setSkipFrame(int frame)
 
 int CameraHardwareSec::previewThreadWrapper()
 {
-    ("%s: starting", __func__);
+    ALOGI("%s: starting", __func__);
     while (1) {
         mPreviewLock.lock();
         while (!mPreviewRunning) {
-            ("%s: calling mSecCamera->stopPreview() and waiting", __func__);
+            ALOGI("%s: calling mSecCamera->stopPreview() and waiting", __func__);
             mSecCamera->stopPreview();
             /* signal that we're stopping */
             mPreviewStoppedCondition.signal();
             mPreviewCondition.wait(mPreviewLock);
-            ("%s: return from wait", __func__);
+            ALOGI("%s: return from wait", __func__);
         }
         mPreviewLock.unlock();
 
         if (mExitPreviewThread) {
-            ("%s: exiting", __func__);
+            ALOGI("%s: exiting", __func__);
             mSecCamera->stopPreview();
             return 0;
         }
@@ -696,7 +696,7 @@ status_t CameraHardwareSec::startPreview()
     mPreviewStartDeferred = false;
 
     if (!mPreviewWindow) {
-        ("%s : deferring", __func__);
+        ALOGI("%s : deferring", __func__);
         mPreviewStartDeferred = true;
         mPreviewLock.unlock();
         return NO_ERROR;
@@ -762,7 +762,7 @@ void CameraHardwareSec::stopPreviewInternal()
         else
             ALOGV("%s : preview running but deferred, doing nothing", __func__);
     } else
-        ("%s : preview not running, doing nothing", __func__);
+        ALOGI("%s : preview not running, doing nothing", __func__);
 }
 
 void CameraHardwareSec::stopPreview()
@@ -1075,6 +1075,7 @@ int CameraHardwareSec::pictureThread()
     int mThumbWidth, mThumbHeight, mThumbSize;
     int cap_width, cap_height, cap_frame_size;
     int JpegImageSize, JpegExifSize;
+    bool isLSISensor = false;
 
     unsigned int output_size = 0;
 
@@ -1131,16 +1132,32 @@ int CameraHardwareSec::pictureThread()
             ret = UNKNOWN_ERROR;
             goto out;
         }
-        ("snapshotandjpeg done\n");
+        ALOGI("snapshotandjpeg done\n");
     }
 
     LOG_TIME_END(1)
     LOG_CAMERA("getSnapshotAndJpeg interval: %lu us", LOG_TIME(1));
 
     if (mSecCamera->getCameraId() == SecCamera::CAMERA_ID_BACK) {
-        // TODO: copy postview to PostviewHeap->base()
-        memcpy(JpegHeap->data, jpeg_data, jpeg_size);
-        JpegImageSize = jpeg_size;
+        isLSISensor = !strncmp((const char*)mCameraSensorName, "S5K4ECGX", 8);
+        if(isLSISensor) {
+            ALOGI("== Camera Sensor Detect %s - Samsung LSI SOC 5M ==\n", mCameraSensorName);
+            // LSI 5M SOC
+            if (!SplitFrame(jpeg_data, SecCamera::getInterleaveDataSize(),
+                            SecCamera::getJpegLineLength(),
+                            mPostViewWidth * 2, mPostViewWidth,
+                            JpegHeap->data, &JpegImageSize,
+                            PostviewHeap->base(), &mPostViewSize)) {
+                ret = UNKNOWN_ERROR;
+                goto out;
+            }
+        } else {
+            ALOGI("== Camera Sensor Detect %s Sony SOC 5M ==\n", mCameraSensorName);
+            decodeInterleaveData(jpeg_data,
+                                 SecCamera::getInterleaveDataSize(),
+                                 mPostViewWidth, mPostViewHeight,
+                                 &JpegImageSize, JpegHeap->data, PostviewHeap->base());
+        }
     } else {
         JpegImageSize = static_cast<int>(output_size);
     }
@@ -1307,6 +1324,189 @@ bool CameraHardwareSec::FindEOIMarkerInJPEG(unsigned char *pBuf, int dwBufSize, 
     }
 
     return false;
+}
+
+bool CameraHardwareSec::SplitFrame(unsigned char *pFrame, int dwSize,
+                    int dwJPEGLineLength, int dwVideoLineLength, int dwVideoHeight,
+                    void *pJPEG, int *pdwJPEGSize,
+                    void *pVideo, int *pdwVideoSize)
+{
+    ALOGV("===========SplitFrame Start==============");
+
+    if (NULL == pFrame || 0 >= dwSize) {
+        ALOGE("There is no contents (pFrame=%p, dwSize=%d", pFrame, dwSize);
+        return false;
+    }
+
+    if (0 == dwJPEGLineLength || 0 == dwVideoLineLength) {
+        ALOGE("There in no input information for decoding interleaved jpeg");
+        return false;
+    }
+
+    unsigned char *pSrc = pFrame;
+    unsigned char *pSrcEnd = pFrame + dwSize;
+
+    unsigned char *pJ = (unsigned char *)pJPEG;
+    int dwJSize = 0;
+    unsigned char *pV = (unsigned char *)pVideo;
+    int dwVSize = 0;
+
+    bool bRet = false;
+    bool isFinishJpeg = false;
+
+    while (pSrc < pSrcEnd) {
+        // Check video start marker
+        if (CheckVideoStartMarker(pSrc)) {
+            int copyLength;
+
+            if (pSrc + dwVideoLineLength <= pSrcEnd)
+                copyLength = dwVideoLineLength;
+            else
+                copyLength = pSrcEnd - pSrc - VIDEO_COMMENT_MARKER_LENGTH;
+
+            // Copy video data
+            if (pV) {
+                memcpy(pV, pSrc + VIDEO_COMMENT_MARKER_LENGTH, copyLength);
+                pV += copyLength;
+                dwVSize += copyLength;
+            }
+
+            pSrc += copyLength + VIDEO_COMMENT_MARKER_LENGTH;
+        } else {
+            // Copy pure JPEG data
+            int size = 0;
+            int dwCopyBufLen = dwJPEGLineLength <= pSrcEnd-pSrc ? dwJPEGLineLength : pSrcEnd - pSrc;
+
+            if (FindEOIMarkerInJPEG((unsigned char *)pSrc, dwCopyBufLen, &size)) {
+                isFinishJpeg = true;
+                size += 2;  // to count EOF marker size
+            } else {
+                if ((dwCopyBufLen == 1) && (pJPEG < pJ)) {
+                    unsigned char checkBuf[2] = { *(pJ - 1), *pSrc };
+
+                    if (CheckEOIMarker(checkBuf))
+                        isFinishJpeg = true;
+                }
+                size = dwCopyBufLen;
+            }
+
+            memcpy(pJ, pSrc, size);
+
+            dwJSize += size;
+
+            pJ += dwCopyBufLen;
+            pSrc += dwCopyBufLen;
+        }
+        if (isFinishJpeg)
+            break;
+    }
+
+    if (isFinishJpeg) {
+        bRet = true;
+        if(pdwJPEGSize)
+            *pdwJPEGSize = dwJSize;
+        if(pdwVideoSize)
+            *pdwVideoSize = dwVSize;
+    } else {
+        ALOGE("DecodeInterleaveJPEG_WithOutDT() => Can not find EOI");
+        bRet = false;
+        if(pdwJPEGSize)
+            *pdwJPEGSize = 0;
+        if(pdwVideoSize)
+            *pdwVideoSize = 0;
+    }
+    ALOGV("===========SplitFrame end==============");
+
+    return bRet;
+}
+
+int CameraHardwareSec::decodeInterleaveData(unsigned char *pInterleaveData,
+                                                 int interleaveDataSize,
+                                                 int yuvWidth,
+                                                 int yuvHeight,
+                                                 int *pJpegSize,
+                                                 void *pJpegData,
+                                                 void *pYuvData)
+{
+    if (pInterleaveData == NULL)
+        return false;
+
+    bool ret = true;
+    unsigned int *interleave_ptr = (unsigned int *)pInterleaveData;
+    unsigned char *jpeg_ptr = (unsigned char *)pJpegData;
+    unsigned char *yuv_ptr = (unsigned char *)pYuvData;
+    unsigned char *p;
+    int jpeg_size = 0;
+    int yuv_size = 0;
+
+    int i = 0;
+
+    ALOGV("decodeInterleaveData Start~~~");
+    while (i < interleaveDataSize) {
+        if ((*interleave_ptr == 0xFFFFFFFF) || (*interleave_ptr == 0x02FFFFFF) ||
+                (*interleave_ptr == 0xFF02FFFF)) {
+            // Padding Data
+//            ALOGE("%d(%x) padding data\n", i, *interleave_ptr);
+            interleave_ptr++;
+            i += 4;
+        }
+        else if ((*interleave_ptr & 0xFFFF) == 0x05FF) {
+            // Start-code of YUV Data
+//            ALOGE("%d(%x) yuv data\n", i, *interleave_ptr);
+            p = (unsigned char *)interleave_ptr;
+            p += 2;
+            i += 2;
+
+            // Extract YUV Data
+            if (pYuvData != NULL) {
+                memcpy(yuv_ptr, p, yuvWidth * 2);
+                yuv_ptr += yuvWidth * 2;
+                yuv_size += yuvWidth * 2;
+            }
+            p += yuvWidth * 2;
+            i += yuvWidth * 2;
+
+            // Check End-code of YUV Data
+            if ((*p == 0xFF) && (*(p + 1) == 0x06)) {
+                interleave_ptr = (unsigned int *)(p + 2);
+                i += 2;
+            } else {
+                ret = false;
+                break;
+            }
+        } else {
+            // Extract JPEG Data
+//            ALOGE("%d(%x) jpg data, jpeg_size = %d bytes\n", i, *interleave_ptr, jpeg_size);
+            if (pJpegData != NULL) {
+                memcpy(jpeg_ptr, interleave_ptr, 4);
+                jpeg_ptr += 4;
+                jpeg_size += 4;
+            }
+            interleave_ptr++;
+            i += 4;
+        }
+    }
+    if (ret) {
+        if (pJpegData != NULL) {
+            // Remove Padding after EOI
+            for (i = 0; i < 3; i++) {
+                if (*(--jpeg_ptr) != 0xFF) {
+                    break;
+                }
+                jpeg_size--;
+            }
+            *pJpegSize = jpeg_size;
+
+        }
+        // Check YUV Data Size
+        if (pYuvData != NULL) {
+            if (yuv_size != (yuvWidth * yuvHeight * 2)) {
+                ret = false;
+            }
+        }
+    }
+    ALOGV("decodeInterleaveData End~~~");
+    return ret;
 }
 
 status_t CameraHardwareSec::dump(int fd) const
@@ -2220,7 +2420,7 @@ static camera_device_t *g_cam_device;
 
 static int HAL_camera_device_close(struct hw_device_t* device)
 {
-    ("%s", __func__);
+    ALOGI("%s", __func__);
     if (device) {
         camera_device_t *cam_device = (camera_device_t *)device;
         delete static_cast<CameraHardwareSec *>(cam_device->priv);
@@ -2588,13 +2788,13 @@ static int HAL_camera_device_open(const struct hw_module_t* module,
 
     g_cam_device->ops = &camera_device_ops;
 
-    ("%s: open camera %s", __func__, id);
+    ALOGI("%s: open camera %s", __func__, id);
 
     g_cam_device->priv = new CameraHardwareSec(cameraId, g_cam_device);
 
 done:
     *device = (hw_device_t *)g_cam_device;
-    ("%s: opened camera %s (%p)", __func__, id, *device);
+    ALOGI("%s: opened camera %s (%p)", __func__, id, *device);
     return 0;
 }
 
