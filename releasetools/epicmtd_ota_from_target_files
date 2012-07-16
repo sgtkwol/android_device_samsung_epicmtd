@@ -77,7 +77,7 @@ def WriteFullOTAPackage(input_zip, output_zip):
   device_specific.FullOTA_Assertions()
   if OPTIONS.backuptool:
     script.Mount("/system")
-    script.RunBackup("backup")a
+    script.RunBackup("backup")
     script.Unmount("/system")
 
   script.ShowProgress(0.5, 0)
