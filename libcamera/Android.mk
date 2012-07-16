@@ -1,5 +1,5 @@
-ifeq ($(TARGET_DEVICE),epicmtd)
 LOCAL_PATH:= $(call my-dir)
+ifeq ($(TARGET_DEVICE),epicmtd)
 include $(CLEAR_VARS)
 
 # HAL module implemenation stored in

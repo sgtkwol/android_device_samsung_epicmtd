@@ -470,6 +470,26 @@ static int fimc_v4l2_s_ctrl(int fp, unsigned int id, unsigned int value)
     return ctrl.value;
 }
 
+static int fimc_v4l2_s_ext_ctrl(int fp, unsigned int id, void *value)
+{
+    struct v4l2_ext_controls ctrls;
+    struct v4l2_ext_control ctrl;
+    int ret;
+
+    ctrl.id = id;
+    ctrl.string = (char *) value;
+
+    ctrls.ctrl_class = V4L2_CTRL_CLASS_CAMERA;
+    ctrls.count = 1;
+    ctrls.controls = &ctrl;
+
+    ret = ioctl(fp, VIDIOC_S_EXT_CTRLS, &ctrls);
+    if (ret < 0)
+        ALOGE("ERR(%s):VIDIOC_S_EXT_CTRLS failed\n", __func__);
+
+    return ret;
+}
+
 static int fimc_v4l2_g_parm(int fp, struct v4l2_streamparm *streamparm)
 {
     int ret;
@@ -787,7 +807,6 @@ int SecCamera::startPreview(void)
         // More parameters for CE147
         ret = fimc_v4l2_s_ctrl(m_cam_fd, V4L2_CID_CAMERA_FOCUS_MODE, m_params->focus_mode);
         CHECK(ret);
-        // TODO
         m_face_detect = 0;
         ret = fimc_v4l2_s_ctrl(m_cam_fd, V4L2_CID_CAMERA_FACE_DETECTION, m_face_detect);
         CHECK(ret);
@@ -801,7 +820,6 @@ int SecCamera::startPreview(void)
         m_beauty_shot = 0;
         ret = fimc_v4l2_s_ctrl(m_cam_fd, V4L2_CID_CAMERA_BEAUTY_SHOT, m_beauty_shot);
         CHECK(ret);
-        // TODO
         m_zoom_level = 0;
         ret = fimc_v4l2_s_ctrl(m_cam_fd, V4L2_CID_CAMERA_ZOOM, m_zoom_level);
         CHECK(ret);
@@ -1098,7 +1116,7 @@ int SecCamera::setPreviewSize(int width, int height, int pixel_format)
 
     int v4lpixelformat = pixel_format;
 
-#if defined(LOG_NDEBUG) && LOG_NDEBUG == 0
+#if defined(ALOG_NDEBUG) && ALOG_NDEBUG == 0
     if (v4lpixelformat == V4L2_PIX_FMT_YUV420)
         ALOGV("PreviewFormat:V4L2_PIX_FMT_YUV420");
     else if (v4lpixelformat == V4L2_PIX_FMT_NV12)
@@ -1195,50 +1213,52 @@ int SecCamera::setSnapshotCmd(void)
     ret = fimc_v4l2_streamon(m_cam_fd);
     CHECK(ret);
 
+    // Additional calls needed for CE147
 
     // GPS
-    //ret = fimc_v4l2_s_ext_ctrl(m_cam_fd, V4L2_CID_CAMERA_GPS_LATITUDE, &gpsInfoLatitude);
-    //CHECK(ret);
-    //ret = fimc_v4l2_s_ext_ctrl(m_cam_fd, V4L2_CID_CAMERA_GPS_LONGITUDE, &gpsInfoLongitude);
-    //CHECK(ret);
-    //ret = fimc_v4l2_s_ext_ctrl(m_cam_fd, V4L2_CID_CAMERA_GPS_ALTITUDE, &gpsInfoAltitude);
-    //CHECK(ret);
-    //ret = fimc_v4l2_s_ext_ctrl(m_cam_fd, V4L2_CID_CAMERA_GPS_PROCESSINGMETHOD, mExifInfo.gps_processing_method);
-    //CHECK(ret);
-    //unsigned long temp = m_gps_timestamp;
-    //ret = fimc_v4l2_s_ext_ctrl(m_cam_fd, V4L2_CID_CAMERA_GPS_TIMESTAMP, &temp);
-    //CHECK(ret);
-    
+    ret = fimc_v4l2_s_ext_ctrl(m_cam_fd, V4L2_CID_CAMERA_GPS_LATITUDE, &gpsInfoLatitude);
+    CHECK(ret);
+    ret = fimc_v4l2_s_ext_ctrl(m_cam_fd, V4L2_CID_CAMERA_GPS_LONGITUDE, &gpsInfoLongitude);
+    CHECK(ret);
+    ret = fimc_v4l2_s_ext_ctrl(m_cam_fd, V4L2_CID_CAMERA_GPS_ALTITUDE, &gpsInfoAltitude);
+    CHECK(ret);
+    ret = fimc_v4l2_s_ext_ctrl(m_cam_fd, V4L2_CID_CAMERA_GPS_PROCESSINGMETHOD,
+        mExifInfo.gps_processing_method);
+    CHECK(ret);
+    unsigned long temp = m_gps_timestamp;
+    ret = fimc_v4l2_s_ext_ctrl(m_cam_fd, V4L2_CID_CAMERA_GPS_TIMESTAMP, &temp);
+    CHECK(ret);
+
     // Time
-    //time_t rawtime;
-    //time(&rawtime);
-    //struct tm *timeinfo = localtime(&rawtime);
-    //ret = fimc_v4l2_s_ext_ctrl(m_cam_fd, V4L2_CID_CAMERA_EXIF_TIME_INFO, timeinfo);
-    //CHECK(ret);
+    time_t rawtime;
+    time(&rawtime);
+    struct tm *timeinfo = localtime(&rawtime);
+    ret = fimc_v4l2_s_ext_ctrl(m_cam_fd, V4L2_CID_CAMERA_EXIF_TIME_INFO, timeinfo);
+    CHECK(ret);
 
     // Orientation
-    //int orientation;
-    //switch (m_exif_orientation) {
-    //case 0:
-    //    orientation = EXIF_ORIENTATION_UP;
-    //    break;
-    //case 90:
-    //    orientation = EXIF_ORIENTATION_90;
-    //    break;
-    //case 180:
-    //    orientation = EXIF_ORIENTATION_180;
-    //    break;
-    //case 270:
-    //    orientation = EXIF_ORIENTATION_270;
-    //    break;
-    //default:
-    //    orientation = EXIF_ORIENTATION_UP;
-    //    break;
-   // }
-   // ret = fimc_v4l2_s_ctrl(m_cam_fd, V4L2_CID_CAMERA_EXIF_ORIENTATION, orientation);
-   // CHECK(ret);
-   // ret = fimc_v4l2_s_ctrl(m_cam_fd, V4L2_CID_CAMERA_CAPTURE, 0);
-   // CHECK(ret);
+    int orientation;
+    switch (m_exif_orientation) {
+    case 0:
+        orientation = EXIF_ORIENTATION_UP;
+        break;
+    case 90:
+        orientation = EXIF_ORIENTATION_90;
+        break;
+    case 180:
+        orientation = EXIF_ORIENTATION_180;
+        break;
+    case 270:
+        orientation = EXIF_ORIENTATION_270;
+        break;
+    default:
+        orientation = EXIF_ORIENTATION_UP;
+        break;
+    }
+    ret = fimc_v4l2_s_ctrl(m_cam_fd, V4L2_CID_CAMERA_EXIF_ORIENTATION, orientation);
+    CHECK(ret);
+    ret = fimc_v4l2_s_ctrl(m_cam_fd, V4L2_CID_CAMERA_CAPTURE, 0);
+    CHECK(ret);
 
     LOG_TIME_END(1)
 
@@ -1443,7 +1463,7 @@ int SecCamera::getSnapshotAndJpeg(unsigned char *yuv_buf, unsigned char *jpeg_bu
     m_events_c.fd = m_cam_fd;
     m_events_c.events = POLLIN | POLLERR;
 
-#if defined(LOG_NDEBUG) && LOG_NDEBUG == 0
+#if defined(ALOG_NDEBUG) && ALOG_NDEBUG == 0
     if (m_snapshot_v4lformat == V4L2_PIX_FMT_YUV420)
         ALOGV("SnapshotFormat:V4L2_PIX_FMT_YUV420");
     else if (m_snapshot_v4lformat == V4L2_PIX_FMT_NV12)
@@ -1629,7 +1649,7 @@ int SecCamera::setSnapshotPixelFormat(int pixel_format)
         m_snapshot_v4lformat = v4lpixelformat;
     }
 
-#if defined(LOG_NDEBUG) && LOG_NDEBUG == 0
+#if defined(ALOG_NDEBUG) && ALOG_NDEBUG == 0
     if (m_snapshot_v4lformat == V4L2_PIX_FMT_YUV420)
         ALOGE("%s : SnapshotFormat:V4L2_PIX_FMT_YUV420", __func__);
     else if (m_snapshot_v4lformat == V4L2_PIX_FMT_NV12)
@@ -2519,7 +2539,6 @@ int SecCamera::setGPSLatitude(const char *gps_latitude)
         m_gps_latitude = lround(strtod(gps_latitude, NULL) * 10000000);
     }
 
-    
     if (m_camera_id == CAMERA_ID_BACK) {
         if (m_gps_enabled) {
             long tmp = (m_gps_latitude >= 0) ? m_gps_latitude : -m_gps_latitude;
@@ -2536,7 +2555,7 @@ int SecCamera::setGPSLatitude(const char *gps_latitude)
             gpsInfoLatitude.second = 0;
         }
     }
-    
+
     ALOGV("%s(m_gps_latitude(%ld))", __func__, m_gps_latitude);
     return 0;
 }
@@ -2551,7 +2570,6 @@ int SecCamera::setGPSLongitude(const char *gps_longitude)
         m_gps_longitude = lround(strtod(gps_longitude, NULL) * 10000000);
     }
 
-    
     if (m_camera_id == CAMERA_ID_BACK) {
         if (m_gps_enabled) {
             long tmp = (m_gps_longitude >= 0) ? m_gps_longitude : -m_gps_longitude;
@@ -2568,7 +2586,7 @@ int SecCamera::setGPSLongitude(const char *gps_longitude)
             gpsInfoLongitude.second = 0;
         }
     }
-    
+
     ALOGV("%s(m_gps_longitude(%ld))", __func__, m_gps_longitude);
     return 0;
 }
@@ -2582,7 +2600,6 @@ int SecCamera::setGPSAltitude(const char *gps_altitude)
         m_gps_altitude = lround(strtod(gps_altitude, NULL) * 100);
     }
 
-    
     if (m_camera_id == CAMERA_ID_BACK) {
         gpsInfoAltitude.plus_minus = (m_gps_altitude >= 0);
         long tmp = gpsInfoAltitude.plus_minus ? m_gps_altitude : -m_gps_altitude;
@@ -2590,7 +2607,7 @@ int SecCamera::setGPSAltitude(const char *gps_altitude)
         gpsInfoAltitude.minute = tmp % 100;
         gpsInfoAltitude.second = 0;
     }
-    
+
     ALOGV("%s(m_gps_altitude(%ld))", __func__, m_gps_altitude);
     return 0;
 }
@@ -2636,9 +2653,6 @@ int SecCamera::setFaceDetectLockUnlock(int facedetect_lockunlock)
 int SecCamera::setObjectPosition(int x, int y)
 {
     ALOGV("%s(setObjectPosition(x=%d, y=%d))", __func__, x, y);
-
-    if (m_preview_width ==640)
-        x = x - 80;
 
     if (fimc_v4l2_s_ctrl(m_cam_fd, V4L2_CID_CAMERA_OBJECT_POSITION_X, x) < 0) {
         ALOGE("ERR(%s):Fail on V4L2_CID_CAMERA_OBJECT_POSITION_X", __func__);

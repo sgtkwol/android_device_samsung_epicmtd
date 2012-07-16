@@ -76,6 +76,9 @@ static const int EFFECT_SKIP_FRAME = 1;
 
 gralloc_module_t const* CameraHardwareSec::mGrallocHal;
 
+// Samsung-specific focus mode
+const char FOCUS_MODE_FACEDETECT[] = "facedetect";
+
 CameraHardwareSec::CameraHardwareSec(int cameraId, camera_device_t *dev)
         :
           mCaptureInProgress(false),
@@ -202,6 +205,8 @@ void CameraHardwareSec::initDefaultParameters(int cameraId)
         parameterString.append(CameraParameters::FOCUS_MODE_INFINITY);
         parameterString.append(",");
         parameterString.append(CameraParameters::FOCUS_MODE_MACRO);
+        parameterString.append(",");
+        parameterString.append(FOCUS_MODE_FACEDETECT);
         p.set(CameraParameters::KEY_SUPPORTED_FOCUS_MODES,
               parameterString.string());
         p.set(CameraParameters::KEY_FOCUS_MODE,
@@ -914,11 +919,6 @@ status_t CameraHardwareSec::cancelAutoFocus()
 {
     ALOGV("%s :", __func__);
 
-    // If preview is not running, cancel autofocus can still be called.
-    // Since the camera subsystem is completely reset on preview start,
-    // cancel AF is a no-op.
-    if (!mPreviewRunning) return NO_ERROR;
-
     // cancelAutoFocus should be allowed after preview is started. But if
     // the preview is deferred, cancelAutoFocus will fail. Ignore it if that is
     // the case.
@@ -1075,7 +1075,6 @@ int CameraHardwareSec::pictureThread()
     int mThumbWidth, mThumbHeight, mThumbSize;
     int cap_width, cap_height, cap_frame_size;
     int JpegImageSize, JpegExifSize;
-    bool isLSISensor = false;
 
     unsigned int output_size = 0;
 
@@ -1139,25 +1138,9 @@ int CameraHardwareSec::pictureThread()
     LOG_CAMERA("getSnapshotAndJpeg interval: %lu us", LOG_TIME(1));
 
     if (mSecCamera->getCameraId() == SecCamera::CAMERA_ID_BACK) {
-        isLSISensor = !strncmp((const char*)mCameraSensorName, "S5K4ECGX", 8);
-        if(isLSISensor) {
-            ALOGI("== Camera Sensor Detect %s - Samsung LSI SOC 5M ==\n", mCameraSensorName);
-            // LSI 5M SOC
-            if (!SplitFrame(jpeg_data, SecCamera::getInterleaveDataSize(),
-                            SecCamera::getJpegLineLength(),
-                            mPostViewWidth * 2, mPostViewWidth,
-                            JpegHeap->data, &JpegImageSize,
-                            PostviewHeap->base(), &mPostViewSize)) {
-                ret = UNKNOWN_ERROR;
-                goto out;
-            }
-        } else {
-            ALOGI("== Camera Sensor Detect %s Sony SOC 5M ==\n", mCameraSensorName);
-            decodeInterleaveData(jpeg_data,
-                                 SecCamera::getInterleaveDataSize(),
-                                 mPostViewWidth, mPostViewHeight,
-                                 &JpegImageSize, JpegHeap->data, PostviewHeap->base());
-        }
+        // TODO: copy postview to PostviewHeap->base()
+        memcpy(JpegHeap->data, jpeg_data, jpeg_size);
+        JpegImageSize = jpeg_size;
     } else {
         JpegImageSize = static_cast<int>(output_size);
     }
@@ -1324,189 +1307,6 @@ bool CameraHardwareSec::FindEOIMarkerInJPEG(unsigned char *pBuf, int dwBufSize, 
     }
 
     return false;
-}
-
-bool CameraHardwareSec::SplitFrame(unsigned char *pFrame, int dwSize,
-                    int dwJPEGLineLength, int dwVideoLineLength, int dwVideoHeight,
-                    void *pJPEG, int *pdwJPEGSize,
-                    void *pVideo, int *pdwVideoSize)
-{
-    ALOGV("===========SplitFrame Start==============");
-
-    if (NULL == pFrame || 0 >= dwSize) {
-        ALOGE("There is no contents (pFrame=%p, dwSize=%d", pFrame, dwSize);
-        return false;
-    }
-
-    if (0 == dwJPEGLineLength || 0 == dwVideoLineLength) {
-        ALOGE("There in no input information for decoding interleaved jpeg");
-        return false;
-    }
-
-    unsigned char *pSrc = pFrame;
-    unsigned char *pSrcEnd = pFrame + dwSize;
-
-    unsigned char *pJ = (unsigned char *)pJPEG;
-    int dwJSize = 0;
-    unsigned char *pV = (unsigned char *)pVideo;
-    int dwVSize = 0;
-
-    bool bRet = false;
-    bool isFinishJpeg = false;
-
-    while (pSrc < pSrcEnd) {
-        // Check video start marker
-        if (CheckVideoStartMarker(pSrc)) {
-            int copyLength;
-
-            if (pSrc + dwVideoLineLength <= pSrcEnd)
-                copyLength = dwVideoLineLength;
-            else
-                copyLength = pSrcEnd - pSrc - VIDEO_COMMENT_MARKER_LENGTH;
-
-            // Copy video data
-            if (pV) {
-                memcpy(pV, pSrc + VIDEO_COMMENT_MARKER_LENGTH, copyLength);
-                pV += copyLength;
-                dwVSize += copyLength;
-            }
-
-            pSrc += copyLength + VIDEO_COMMENT_MARKER_LENGTH;
-        } else {
-            // Copy pure JPEG data
-            int size = 0;
-            int dwCopyBufLen = dwJPEGLineLength <= pSrcEnd-pSrc ? dwJPEGLineLength : pSrcEnd - pSrc;
-
-            if (FindEOIMarkerInJPEG((unsigned char *)pSrc, dwCopyBufLen, &size)) {
-                isFinishJpeg = true;
-                size += 2;  // to count EOF marker size
-            } else {
-                if ((dwCopyBufLen == 1) && (pJPEG < pJ)) {
-                    unsigned char checkBuf[2] = { *(pJ - 1), *pSrc };
-
-                    if (CheckEOIMarker(checkBuf))
-                        isFinishJpeg = true;
-                }
-                size = dwCopyBufLen;
-            }
-
-            memcpy(pJ, pSrc, size);
-
-            dwJSize += size;
-
-            pJ += dwCopyBufLen;
-            pSrc += dwCopyBufLen;
-        }
-        if (isFinishJpeg)
-            break;
-    }
-
-    if (isFinishJpeg) {
-        bRet = true;
-        if(pdwJPEGSize)
-            *pdwJPEGSize = dwJSize;
-        if(pdwVideoSize)
-            *pdwVideoSize = dwVSize;
-    } else {
-        ALOGE("DecodeInterleaveJPEG_WithOutDT() => Can not find EOI");
-        bRet = false;
-        if(pdwJPEGSize)
-            *pdwJPEGSize = 0;
-        if(pdwVideoSize)
-            *pdwVideoSize = 0;
-    }
-    ALOGV("===========SplitFrame end==============");
-
-    return bRet;
-}
-
-int CameraHardwareSec::decodeInterleaveData(unsigned char *pInterleaveData,
-                                                 int interleaveDataSize,
-                                                 int yuvWidth,
-                                                 int yuvHeight,
-                                                 int *pJpegSize,
-                                                 void *pJpegData,
-                                                 void *pYuvData)
-{
-    if (pInterleaveData == NULL)
-        return false;
-
-    bool ret = true;
-    unsigned int *interleave_ptr = (unsigned int *)pInterleaveData;
-    unsigned char *jpeg_ptr = (unsigned char *)pJpegData;
-    unsigned char *yuv_ptr = (unsigned char *)pYuvData;
-    unsigned char *p;
-    int jpeg_size = 0;
-    int yuv_size = 0;
-
-    int i = 0;
-
-    ALOGV("decodeInterleaveData Start~~~");
-    while (i < interleaveDataSize) {
-        if ((*interleave_ptr == 0xFFFFFFFF) || (*interleave_ptr == 0x02FFFFFF) ||
-                (*interleave_ptr == 0xFF02FFFF)) {
-            // Padding Data
-//            ALOGE("%d(%x) padding data\n", i, *interleave_ptr);
-            interleave_ptr++;
-            i += 4;
-        }
-        else if ((*interleave_ptr & 0xFFFF) == 0x05FF) {
-            // Start-code of YUV Data
-//            ALOGE("%d(%x) yuv data\n", i, *interleave_ptr);
-            p = (unsigned char *)interleave_ptr;
-            p += 2;
-            i += 2;
-
-            // Extract YUV Data
-            if (pYuvData != NULL) {
-                memcpy(yuv_ptr, p, yuvWidth * 2);
-                yuv_ptr += yuvWidth * 2;
-                yuv_size += yuvWidth * 2;
-            }
-            p += yuvWidth * 2;
-            i += yuvWidth * 2;
-
-            // Check End-code of YUV Data
-            if ((*p == 0xFF) && (*(p + 1) == 0x06)) {
-                interleave_ptr = (unsigned int *)(p + 2);
-                i += 2;
-            } else {
-                ret = false;
-                break;
-            }
-        } else {
-            // Extract JPEG Data
-//            ALOGE("%d(%x) jpg data, jpeg_size = %d bytes\n", i, *interleave_ptr, jpeg_size);
-            if (pJpegData != NULL) {
-                memcpy(jpeg_ptr, interleave_ptr, 4);
-                jpeg_ptr += 4;
-                jpeg_size += 4;
-            }
-            interleave_ptr++;
-            i += 4;
-        }
-    }
-    if (ret) {
-        if (pJpegData != NULL) {
-            // Remove Padding after EOI
-            for (i = 0; i < 3; i++) {
-                if (*(--jpeg_ptr) != 0xFF) {
-                    break;
-                }
-                jpeg_size--;
-            }
-            *pJpegSize = jpeg_size;
-
-        }
-        // Check YUV Data Size
-        if (pYuvData != NULL) {
-            if (yuv_size != (yuvWidth * yuvHeight * 2)) {
-                ret = false;
-            }
-        }
-    }
-    ALOGV("decodeInterleaveData End~~~");
-    return ret;
 }
 
 status_t CameraHardwareSec::dump(int fd) const
@@ -1953,12 +1753,28 @@ status_t CameraHardwareSec::setParameters(const CameraParameters& params)
                 mParameters.set(CameraParameters::KEY_FOCUS_DISTANCES,
                                 BACK_CAMERA_INFINITY_FOCUS_DISTANCES_STR);
             }
+            else if (!strcmp(new_focus_mode_str, FOCUS_MODE_FACEDETECT)) {
+                // Enable face detect here, SecCamera will take care of the rest
+                if (mSecCamera->setFaceDetect(FACE_DETECTION_ON) < 0) {
+                    ALOGE("%s::mSecCamera->setFaceDetect(%d) fail", __func__, FACE_DETECTION_ON);
+                    ret = UNKNOWN_ERROR;
+                }
+                mParameters.set(CameraParameters::KEY_FOCUS_MODE, new_focus_mode_str);
+                mParameters.set(CameraParameters::KEY_FOCUS_DISTANCES,
+                                BACK_CAMERA_AUTO_FOCUS_DISTANCES_STR);
+            }
             else {
                 ALOGE("%s::unmatched focus_mode(%s)", __func__, new_focus_mode_str);
                 ret = UNKNOWN_ERROR;
             }
 
             if (0 <= new_focus_mode) {
+                // Disable face-detect
+                if (mSecCamera->setFaceDetect(FACE_DETECTION_OFF) < 0) {
+                    ALOGE("%s::mSecCamera->setFaceDetect(%d) fail", __func__, FACE_DETECTION_OFF);
+                    ret = UNKNOWN_ERROR;
+                }
+
                 if (mSecCamera->setFocusMode(new_focus_mode) < 0) {
                     ALOGE("%s::mSecCamera->setFocusMode(%d) fail", __func__, new_focus_mode);
                     ret = UNKNOWN_ERROR;
