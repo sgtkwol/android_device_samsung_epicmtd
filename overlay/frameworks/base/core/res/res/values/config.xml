@@ -61,11 +61,11 @@ than the size of the config_autoBrightnessLevels array.
          than the size of the config_autoBrightnessLevels array.
     -->
      <integer-array name="config_autoBrightnessButtonBacklightValues">
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
+        <item>255</item>
+        <item>255</item>
+        <item>255</item>
+        <item>255</item>
+        <item>255</item>
     </integer-array>
 
     <!-- Array of output values for keyboard backlight corresponding to the LUX values
@@ -74,11 +74,11 @@ than the size of the config_autoBrightnessLevels array.
          GalaxyS has no keyboard so all values are zero.
     -->
     <integer-array name="config_autoBrightnessKeyboardBacklightValues">
-        <item>32</item>
-        <item>68</item>
-        <item>116</item>
-        <item>178</item>
-        <item>253</item>
+        <item>255</item>
+        <item>255</item>
+        <item>255</item>
+        <item>255</item>
+        <item>255</item>
     </integer-array>  
     
     <!-- Component name of the default wallpaper. This will be ImageWallpaper if not 
