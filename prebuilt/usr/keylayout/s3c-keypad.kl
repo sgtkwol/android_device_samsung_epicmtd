@@ -61,7 +61,7 @@ key 50    DPAD_RIGHT        WAKE_DROPPED
 key 51    VOLUME_UP         WAKE
 key 52    VOLUME_DOWN       WAKE
 key 53    HOME              WAKE_DROPPED
-key 54    SEARCH            WAKE_DROPPED
+key 54    ASSIST            WAKE_DROPPED
 key 55    MENU              WAKE_DROPPED
 
 key 56    FOCUS
