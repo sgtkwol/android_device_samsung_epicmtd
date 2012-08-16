@@ -187,6 +187,9 @@ PRODUCT_TAGS += dalvik.gc.type-precise
 PRODUCT_COPY_FILES += \
     device/samsung/epicmtd/recovery.bin:recovery.bin
 
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/recovery/postrecoveryboot.sh:recovery/root/sbin/postrecoveryboot.sh
+
 # dalvik.vm.heapstartsize=5m
 # dalvik.vm.heapgrowthlimit=48m
 # dalvik.vm.heapsize=128m
