@@ -59,6 +59,10 @@ int main() {
     }
 
     write(fd, addr_from_ril, 18);
+
+    // Set bluetooth owner
+    fchown(fd, 1002, 1002);
+
     close(fd);
     ALOGE("System will now read mac on reboot.\n");
     return (0);
