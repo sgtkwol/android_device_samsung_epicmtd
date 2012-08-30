@@ -107,7 +107,8 @@ PRODUCT_PACKAGES += \
 
 # Device-specific packages
 PRODUCT_PACKAGES += \
-	EpicParts
+	EpicParts \
+	Torch
 
 # These are the hardware-specific features
 PRODUCT_COPY_FILES += \
