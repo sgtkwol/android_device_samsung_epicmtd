@@ -73,7 +73,7 @@ BOARD_KERNEL_PAGESIZE := 4096
 
 # Define kernel config for inline building
 TARGET_KERNEL_CONFIG := cyanogenmod_epicmtd_defconfig
-TARGET_KERNEL_SOURCE := kernel/samsung/victory/Kernel/
+TARGET_KERNEL_SOURCE := kernel/samsung/epicmtd/
 
 # Fallback
 TARGET_PREBUILT_KERNEL := device/samsung/epicmtd/kernel

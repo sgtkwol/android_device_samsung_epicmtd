@@ -1,8 +1,8 @@
 [
  {
-   "repository": "android_kernel_samsung_victory",
-   "target_path": "kernel/samsung/victory",
-   "branch": "jellybean"
+   "repository": "android_kernel_samsung_epicmtd",
+   "target_path": "kernel/samsung/epicmtd",
+   "branch": "jb"
  },
  {
    "repository": "android_hardware_samsung",
