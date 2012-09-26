@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2012 The Android Open Source Project
+ * Copyright (c) 2012 The CyanogenMod Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +26,7 @@
 #include <hardware/hardware.h>
 #include <hardware/power.h>
 
+#define SCALING_GOVERNOR_PATH "/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor"
 #define BOOSTPULSE_ONDEMAND "/sys/devices/system/cpu/cpufreq/ondemand/boostpulse"
 #define BOOSTPULSE_INTERACTIVE "/sys/devices/system/cpu/cpufreq/interactive/boostpulse"
 #define SAMPLING_RATE_ONDEMAND "/sys/devices/system/cpu/cpufreq/ondemand/sampling_rate"
@@ -37,6 +39,34 @@ struct epicmtd_power_module {
     int boostpulse_fd;
     int boostpulse_warned;
 };
+
+static int sysfs_read(char *path, char *s, int num_bytes)
+{
+    char buf[80];
+    int count;
+    int ret = 0;
+    int fd = open(path, O_RDONLY);
+
+    if (fd < 0) {
+        strerror_r(errno, buf, sizeof(buf));
+        ALOGE("Error opening %s: %s\n", path, buf);
+
+        return -1;
+    }
+
+    if ((count = read(fd, s, num_bytes - 1)) < 0) {
+        strerror_r(errno, buf, sizeof(buf));
+        ALOGE("Error writing to %s: %s\n", path, buf);
+
+        ret = -1;
+    } else {
+        s[count] = '\0';
+    }
+
+    close(fd);
+
+    return ret;
+}
 
 static void sysfs_write(char *path, char *s)
 {
@@ -59,22 +89,47 @@ static void sysfs_write(char *path, char *s)
     close(fd);
 }
 
+static int get_scaling_governor(char governor[], int size) {
+    if (sysfs_read(SCALING_GOVERNOR_PATH, governor,
+                size) == -1) {
+        // Can't obtain the scaling governor. Return.
+        return -1;
+    } else {
+        // Strip newline at the end.
+        int len = strlen(governor);
+
+        len--;
+
+        while (len >= 0 && (governor[len] == '\n' || governor[len] == '\r'))
+            governor[len--] = '\0';
+    }
+
+    return 0;
+}
+
 static int boostpulse_open(struct epicmtd_power_module *power)
 {
     char buf[80];
+    char governor[80];
 
     pthread_mutex_lock(&power->lock);
 
     if (power->boostpulse_fd < 0) {
-        power->boostpulse_fd = open(BOOSTPULSE_ONDEMAND, O_WRONLY);
-        if (power->boostpulse_fd < 0) {
-            power->boostpulse_fd = open(BOOSTPULSE_INTERACTIVE, O_WRONLY);
+        if (get_scaling_governor(governor, sizeof(governor)) < 0) {
+            ALOGE("Can't read scaling governor.");
+            power->boostpulse_warned = 1;
+        } else {
+            if (strncmp(governor, "ondemand", 8) == 0)
+                power->boostpulse_fd = open(BOOSTPULSE_ONDEMAND, O_WRONLY);
+            else if (strncmp(governor, "interactive", 11) == 0)
+                power->boostpulse_fd = open(BOOSTPULSE_INTERACTIVE, O_WRONLY);
 
             if (power->boostpulse_fd < 0 && !power->boostpulse_warned) {
                 strerror_r(errno, buf, sizeof(buf));
                 ALOGE("Error opening boostpulse: %s\n", buf);
                 power->boostpulse_warned = 1;
-            }
+            } else if (power->boostpulse_fd > 0)
+                ALOGD("Opened %s boostpulse interface", governor);
         }
     }
 
@@ -88,23 +143,29 @@ static void epicmtd_power_hint(struct power_module *module, power_hint_t hint,
     struct epicmtd_power_module *power = (struct epicmtd_power_module *) module;
     char buf[80];
     int len;
+    int duration = 1;
 
     switch (hint) {
     case POWER_HINT_INTERACTION:
+    case POWER_HINT_CPU_BOOST:
         if (boostpulse_open(power) >= 0) {
-	    len = write(power->boostpulse_fd, "1", 1);
+            if (data != NULL)
+                duration = (int) data;
 
-	    if (len < 0) {
-	        strerror_r(errno, buf, sizeof(buf));
-		    ALOGE("Error writing to boostpulse: %s\n", buf);
+            snprintf(buf, sizeof(buf), "%d", duration);
+            len = write(power->boostpulse_fd, buf, strlen(buf));
 
-            pthread_mutex_lock(&power->lock);
-            close(power->boostpulse_fd);
-            power->boostpulse_fd = -1;
-            power->boostpulse_warned = 0;
-            pthread_mutex_unlock(&power->lock);
-	    }
-	}
+            if (len < 0) {
+                strerror_r(errno, buf, sizeof(buf));
+	            ALOGE("Error writing to boostpulse: %s\n", buf);
+
+                pthread_mutex_lock(&power->lock);
+                close(power->boostpulse_fd);
+                power->boostpulse_fd = -1;
+                power->boostpulse_warned = 0;
+                pthread_mutex_unlock(&power->lock);
+            }
+        }
         break;
 
     case POWER_HINT_VSYNC:
@@ -138,7 +199,7 @@ struct epicmtd_power_module HAL_MODULE_INFO_SYM = {
             hal_api_version: HARDWARE_HAL_API_VERSION,
             id: POWER_HARDWARE_MODULE_ID,
             name: "EpicMTD Power HAL",
-            author: "The Android Open Source Project",
+            author: "The CyanogenMod Project",
             methods: &power_module_methods,
         },
        init: epicmtd_power_init,
