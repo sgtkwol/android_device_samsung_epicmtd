@@ -98,6 +98,16 @@ on boot
   # Enable WiFi
   setprop wifi.interface "wlan0"
 
+# change permission for uart_switch
+    chown radio radio /sys/devices/virtual/sec/uart_switch/UART_SEL/value
+    chmod 660 /sys/devices/virtual/sec/uart_switch/UART_SEL/value
+    chown radio radio /sys/devices/virtual/sec/uart_switch/UART_SEL1/value
+    chmod 660 /sys/devices/virtual/sec/uart_switch/UART_SEL1/value
+
+# change permission for usb_switch
+    chown radio radio /sys/bus/i2c/drivers/fsa9480/1-0025/switch
+    chmod 660 /sys/bus/i2c/drivers/fsa9480/1-0025/switch
+
   # Change ownerships for USB
   chown radio system /sys/class/sec/switch/usb_sel
   chown radio system /sys/class/sec/switch/uart_sel
