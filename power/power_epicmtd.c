@@ -29,9 +29,6 @@
 #define SCALING_GOVERNOR_PATH "/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor"
 #define BOOSTPULSE_ONDEMAND "/sys/devices/system/cpu/cpufreq/ondemand/boostpulse"
 #define BOOSTPULSE_INTERACTIVE "/sys/devices/system/cpu/cpufreq/interactive/boostpulse"
-#define SAMPLING_RATE_ONDEMAND "/sys/devices/system/cpu/cpufreq/ondemand/sampling_rate"
-#define SAMPLING_RATE_SCREEN_ON "50000"
-#define SAMPLING_RATE_SCREEN_OFF "500000"
 
 struct epicmtd_power_module {
     struct power_module base;
@@ -66,27 +63,6 @@ static int sysfs_read(char *path, char *s, int num_bytes)
     close(fd);
 
     return ret;
-}
-
-static void sysfs_write(char *path, char *s)
-{
-    char buf[80];
-    int len;
-    int fd = open(path, O_WRONLY);
-
-    if (fd < 0) {
-        strerror_r(errno, buf, sizeof(buf));
-        ALOGE("Error opening %s: %s\n", path, buf);
-        return;
-    }
-
-    len = write(fd, s, strlen(s));
-    if (len < 0) {
-        strerror_r(errno, buf, sizeof(buf));
-        ALOGE("Error writing to %s: %s\n", path, buf);
-    }
-
-    close(fd);
 }
 
 static int get_scaling_governor(char governor[], int size) {
@@ -178,13 +154,12 @@ static void epicmtd_power_hint(struct power_module *module, power_hint_t hint,
 
 static void epicmtd_power_set_interactive(struct power_module *module, int on)
 {
-    sysfs_write(SAMPLING_RATE_ONDEMAND,
-            on ? SAMPLING_RATE_SCREEN_ON : SAMPLING_RATE_SCREEN_OFF);
+    return;
 }
 
 static void epicmtd_power_init(struct power_module *module)
 {
-    sysfs_write(SAMPLING_RATE_ONDEMAND, SAMPLING_RATE_SCREEN_ON);
+    return;
 }
 
 static struct hw_module_methods_t power_module_methods = {
