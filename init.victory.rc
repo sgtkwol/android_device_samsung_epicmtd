@@ -83,6 +83,9 @@ on post-fs
   chown system input /dev/i2c-1
 
 on boot 
+  # for systrace
+  mount debugfs /sys/kernel/debug /sys/kernel/debug
+
   # Fake some battery state
   setprop status.battery.state Slow
   setprop status.battery.level 5
