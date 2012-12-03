@@ -13,8 +13,7 @@ on init
 on fs
   # External microSDcard storage
   export EXTERNAL_STORAGE /storage/sdcard0
-  mkdir /storage 0050 system sdcard_r
-  mkdir /storage/sdcard0 0000 system system
+  mkdir /storage/sdcard0 0000 root root
   symlink /storage/sdcard0 /sdcard
   symlink /storage/sdcard0 /mnt/sdcard
 
@@ -319,7 +318,7 @@ service victory-rild /system/bin/rild
   socket rild stream 660 root radio
   socket rild-debug stream 660 radio system
   user root
-  group radio cache inet misc audio sdcard_rw log
+  group radio cache inet misc audio log
 
 # 3D init
 service pvrsrvinit /system/vendor/bin/pvrsrvinit
