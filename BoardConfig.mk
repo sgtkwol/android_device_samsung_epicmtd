@@ -49,6 +49,8 @@ ENABLE_WEBGL := true
 # Bluetooth
 BOARD_HAVE_BLUETOOTH := true
 BOARD_HAVE_BLUETOOTH_BCM := true
+BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := device/samsung/epicmtd/bluetooth
+BOARD_BLUEDROID_VENDOR_CONF := device/samsung/epicmtd/bluetooth/vnd_epicmtd.txt
 
 # Video Devices
 BOARD_USES_OVERLAY := true
