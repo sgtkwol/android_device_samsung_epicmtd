@@ -249,6 +249,9 @@ static int set_light_keyboard(struct light_device_t *dev,
 static int set_light_buttons(struct light_device_t *dev,
 			struct light_state_t const *state)
 {
+        /* Hack, control keyboard light too */
+        set_light_keyboard(dev, state);
+
 	int touch_led_control = !!(state->color & 0x00ffffff);
 	int res;
 
