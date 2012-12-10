@@ -864,6 +864,7 @@ const char *AudioHardware::getOutputRouteFromDevice(uint32_t device)
     case AudioSystem::DEVICE_OUT_EARPIECE:
         return "RCV";
     case AudioSystem::DEVICE_OUT_ANLG_DOCK_HEADSET:
+    case AudioSystem::DEVICE_OUT_DGTL_DOCK_HEADSET:
         if (mMode == AudioSystem::MODE_RINGTONE) return "RING_SPK";
         else return "EXTRA_DOCK_SPEAKER";
     case AudioSystem::DEVICE_OUT_SPEAKER:
@@ -878,6 +879,7 @@ const char *AudioHardware::getOutputRouteFromDevice(uint32_t device)
     case (AudioSystem::DEVICE_OUT_SPEAKER|AudioSystem::DEVICE_OUT_WIRED_HEADPHONE):
     case (AudioSystem::DEVICE_OUT_SPEAKER|AudioSystem::DEVICE_OUT_WIRED_HEADSET):
     case (AudioSystem::DEVICE_OUT_SPEAKER|AudioSystem::DEVICE_OUT_ANLG_DOCK_HEADSET):
+    case (AudioSystem::DEVICE_OUT_SPEAKER|AudioSystem::DEVICE_OUT_DGTL_DOCK_HEADSET):
         if (mMode == AudioSystem::MODE_RINGTONE) return "RING_SPK_HP";
         else return "SPK_HP";
     case AudioSystem::DEVICE_OUT_BLUETOOTH_SCO:
@@ -896,6 +898,7 @@ const char *AudioHardware::getVoiceRouteFromDevice(uint32_t device)
         return "RCV";
     case AudioSystem::DEVICE_OUT_SPEAKER:
     case AudioSystem::DEVICE_OUT_ANLG_DOCK_HEADSET:
+    case AudioSystem::DEVICE_OUT_DGTL_DOCK_HEADSET:
         return "SPK";
     case AudioSystem::DEVICE_OUT_WIRED_HEADPHONE:
     case AudioSystem::DEVICE_OUT_WIRED_HEADSET:
