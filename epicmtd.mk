@@ -40,7 +40,6 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
      device/samsung/epicmtd/prebuilt/bin/pppd_runner:system/bin/pppd_runner \
      device/samsung/epicmtd/prebuilt/etc/ppp/ip-up:system/etc/ppp/ip-up
-#FRAMEWORKS_BASE_SUBDIRS += ../../$(LOCAL_PATH)/epicril/
 
 # Keylayout and Keychars
 PRODUCT_COPY_FILES += \
@@ -147,7 +146,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     net.interfaces.defaultroute=cdma \
     net.connectivity.type=CDMA1 \
     mobiledata.interfaces=ppp0,uwbr0 \
-    ro.telephony.ril_class=SamsungExynos3RIL \
+    ro.telephony.ril_class=EpicRIL \
     ro.telephony.ril.v3=datacall \
     ro.ril.samsung_cdma=true
 

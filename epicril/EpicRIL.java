@@ -22,6 +22,7 @@ import android.content.Context;
 import android.os.Message;
 import android.os.Parcel;
 import android.os.SystemProperties;
+import android.telephony.SignalStrength;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -30,7 +31,7 @@ import java.util.ArrayList;
 /**
 * {@hide}
 */
-public class EpicRIL extends SamsungRIL implements CommandsInterface {
+public class EpicRIL extends SamsungExynos3RIL implements CommandsInterface {
     public EpicRIL(Context context, int networkMode, int cdmaSubscription) {
         super(context, networkMode, cdmaSubscription);
     }
@@ -38,17 +39,10 @@ public class EpicRIL extends SamsungRIL implements CommandsInterface {
     @Override
     protected Object
     responseSignalStrength(Parcel p) {
-        int numInts = 12;
-        int response[];
 
-        response = new int[numInts];
+        int[] response = new int[7];
         for (int i = 0 ; i < 7 ; i++) {
             response[i] = p.readInt();
-        //    Log.d(LOG_TAG, "SignalStrength: response[" + i + "]: " + response[i]);
-        }
-        // SamsungRIL is a v3 RIL, fill the rest with -1
-        for (int i = 7; i < numInts; i++) {
-            response[i] = -1;
         //    Log.d(LOG_TAG, "SignalStrength: response[" + i + "]: " + response[i]);
         }
 
@@ -63,6 +57,10 @@ public class EpicRIL extends SamsungRIL implements CommandsInterface {
            response[2] = ((response[2]-96)/2)+96;
         }
         // Framework takes care of the rest for us.
-        return response;
+
+        SignalStrength signalStrength = new SignalStrength(
+            response[0], response[1], response[2], response[3], response[4],
+            response[5], response[6], false);
+        return signalStrength;
     }
  }
