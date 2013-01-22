@@ -14,6 +14,7 @@
 # limitations under the License.
 
 LOCAL_PATH:= $(call my-dir)
+ifeq ($(TARGET_DEVICE),epicmtd)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE_TAGS := optional
@@ -25,4 +26,5 @@ LOCAL_SHARED_LIBRARIES := libcutils
 LOCAL_MODULE := bdaddr_read
 
 include $(BUILD_EXECUTABLE)
+endif
 
