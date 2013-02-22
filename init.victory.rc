@@ -185,7 +185,7 @@ on boot
   chown radio system /sys/class/sec/sec_lcd/lcdtype_file_cmd
   chown radio radio /sys/class/mdnieset_ui/switch_mdnieset_ui/mdnieset_ui_file_cmd
   chown radio radio /sys/class/mdnieset_outdoor/switch_mdnieset_outdoor/mdnieset_outdoor_file_cmd
-
+  chmod 0666 /sys/class/backlight/panel/brightness
   chown system system /sys/class/backlight/s5p_bl/brightness
   chown radio system /sys/devices/platform/s3cfb/lcd_power
 
